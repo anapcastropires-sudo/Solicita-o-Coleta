@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Solicitação de Coleta</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #f1f5f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 16px;
+    }
+    .card {
+      background: #ffffff;
+      padding: 28px 20px;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      width: 100%;
+      max-width: 380px;
+      text-align: center;
+    }
+    h2 {
+      margin: 0 0 8px 0;
+      color: #0f172a;
+      font-size: 22px;
+    }
+    p {
+      color: #64748b;
+      font-size: 14px;
+      margin: 0 0 20px 0;
+    }
+    input {
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      border: 2px solid #cbd5e1;
+      border-radius: 10px;
+      outline: none;
+      margin-bottom: 16px;
+      transition: border-color 0.2s;
+    }
+    input:focus {
+      border-color: #2563eb;
+    }
+    button {
+      width: 100%;
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 16px;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:active {
+      background: #1d4ed8;
+    }
+    button:disabled {
+      background: #94a3b8;
+    }
+    .status {
+      display: none;
+      margin-top: 16px;
+      padding: 12px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 15px;
+    }
+    .sucesso {
+      background: #dcfce7;
+      color: #15803d;
+    }
+    .erro {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <h2>🛵 Pedido de Coleta</h2>
+  <p>Informe o nome da clínica ou veterinário</p>
+
+  <form id="coletaForm">
+    <input 
+      type="text" 
+      id="clinica" 
+      placeholder="Ex: Clínica Vet Vida" 
+      required 
+      autocomplete="off"
+    >
+    <button type="submit" id="btnEnviar">🚀 Solicitar Coleta</button>
+  </form>
+
+  <div id="msgSucesso" class="status sucesso">✓ Coleta solicitada com sucesso!</div>
+  <div id="msgErro" class="status erro">⚠️ Erro ao enviar. Tente novamente.</div>
+</div>
+
+<script>
+  // COLE SEU LINK DO FORMSPREE AQUI ENTRE AS ASPAS:
+  const ENDPOINT = https://formspree.io/f/mwlvzava
+
+  const form = document.getElementById('coletaForm');
+  const btn = document.getElementById('btnEnviar');
+  const msgSucesso = document.getElementById('msgSucesso');
+  const msgErro = document.getElementById('msgErro');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    btn.disabled = true;
+    btn.innerText = "Enviando...";
+    msgSucesso.style.display = 'none';
+    msgErro.style.display = 'none';
+
+    const clinica = document.getElementById('clinica').value.trim();
+
+    try {
+      const response = await fetch(ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          Clinica: clinica,
+          Horario: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+          Data: new Date().toLocaleDateString('pt-BR')
+        })
+      });
+
+      if (response.ok) {
+        msgSucesso.style.display = 'block';
+        form.reset();
+      } else {
+        msgErro.style.display = 'block';
+      }
+    } catch (err) {
+      msgErro.style.display = 'block';
+    } finally {
+      btn.disabled = false;
+      btn.innerText = "🚀 Solicitar Coleta";
+    }
+  });
+</script>
+
+</body>
+</html>
